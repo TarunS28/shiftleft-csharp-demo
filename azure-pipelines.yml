@@ -1,0 +1,39 @@
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+- group: shiftleft-token
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build .NET Core project'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '-c Release'
+- task: PowerShell@2
+  displayName: Download ShiftLeft cli
+  inputs:
+    targetType: 'inline'
+    script: |
+      Invoke-WebRequest -Uri 'https://cdn.shiftleft.io/download/sl-latest-windows-x64.zip' -OutFile $(Agent.HomeDirectory)\sl.zip
+      Expand-Archive -Path $(Agent.HomeDirectory)\sl.zip -DestinationPath $(Agent.HomeDirectory)\
+- task: CmdLine@2
+  displayName: Analyze with Shiftleft
+  inputs:
+    script: |
+        $(Agent.HomeDirectory)\sl.exe analyze --wait --app ShiftLeftDotnetCoreDemo --tag branch=$(Build.SourceBranchName) --tag app.group="AppSecTestApps" --csharp "netcoreWebapi/netcoreWebapi.sln"
+    workingDirectory: '$(Build.SourcesDirectory)'
+  env:
+    SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)    
+- task: CmdLine@2
+  displayName: Shiftleft Check-Analysis 
+  inputs:
+    script: |
+        $(Agent.HomeDirectory)\sl.exe check-analysis --app ShiftLeftDotnetCoreDemo --v2 --config shiftleft.yml      
+    workingDirectory: '$(Build.SourcesDirectory)'
+  env:
+    SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)
