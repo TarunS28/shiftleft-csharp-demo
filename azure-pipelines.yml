@@ -25,7 +25,7 @@ steps:
   displayName: Analyze with Shiftleft
   inputs:
     script: |
-        $(Agent.HomeDirectory)\sl.exe analyze --wait --app ShiftLeftDotnetCoreDemo --tag branch=$(Build.SourceBranchName) --tag app.group="AppSecTestApps" --csharp "netcoreWebapi/netcoreWebapi.sln"
+        $(Agent.HomeDirectory)\sl.exe analyze --wait --app ShiftLeftDotnetCoreDemoT --tag branch=$(Build.SourceBranchName) --tag app.group="AppSecTestApps" --csharp "netcoreWebapi/netcoreWebapi.sln"
     workingDirectory: '$(Build.SourcesDirectory)'
   env:
     SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)    
@@ -33,7 +33,7 @@ steps:
   displayName: Shiftleft Check-Analysis 
   inputs:
     script: |
-        $(Agent.HomeDirectory)\sl.exe check-analysis --app ShiftLeftDotnetCoreDemo --v2 --config shiftleft.yml      
+        $(Agent.HomeDirectory)\sl.exe check-analysis --app ShiftLeftDotnetCoreDemoT --v2 --config shiftleft.yml      
     workingDirectory: '$(Build.SourcesDirectory)'
   env:
     SHIFTLEFT_ACCESS_TOKEN: $(SHIFTLEFT_ACCESS_TOKEN)
